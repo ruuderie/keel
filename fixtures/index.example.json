@@ -1,0 +1,10 @@
+{
+  "schema": "keel.index/0",
+  "seq": 1,
+  "entries": [
+    {
+      "alias": "example-gguf",
+      "artifact_cid": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ]
+}

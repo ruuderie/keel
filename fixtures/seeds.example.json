@@ -1,0 +1,11 @@
+{
+  "schema": "keel.seeds/0",
+  "note": "Override this file. At least one entry should be a non-DNS multiaddr.",
+  "publishers": [],
+  "mirrors": [
+    {
+      "multiaddr": "/ip4/127.0.0.1/tcp/8080/http",
+      "comment": "local seeder — replace"
+    }
+  ]
+}
