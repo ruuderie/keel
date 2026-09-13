@@ -1,0 +1,12 @@
+[package]
+name = "keel-runner"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Inference runners: CID-addressed tiny weights (CI) and llama.cpp (ops)"
+
+[dependencies]
+keel-types = { workspace = true }
+thiserror = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
