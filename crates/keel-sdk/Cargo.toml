@@ -1,0 +1,13 @@
+[package]
+name = "keel-sdk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Keel library client (second required client surface)"
+
+[dependencies]
+keel-types = { workspace = true }
+keel-node = { workspace = true }
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }

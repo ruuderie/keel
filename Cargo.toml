@@ -4,6 +4,8 @@ members = [
     "crates/keel-types",
     "crates/keel-runner",
     "crates/keel-node",
+    "crates/keel-sdk",
+    "crates/keel-cli",
 ]
 
 [workspace.package]
