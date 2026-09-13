@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/keel-types",
     "crates/keel-runner",
+    "crates/keel-node",
 ]
 
 [workspace.package]

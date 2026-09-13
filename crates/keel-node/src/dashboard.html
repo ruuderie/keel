@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keel operator</title>
+  <style>
+    :root { color-scheme: dark; --bg: #111; --fg: #e8e8e8; --muted: #9a9a9a; --line: #2a2a2a; --ok: #8f8; --warn: #cc8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg); color: var(--fg); }
+    header { padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    h1 { font-size: 14px; font-weight: 600; margin: 0; }
+    h2 { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+    main { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+    @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+    section { min-width: 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 4px 8px 4px 0; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-weight: 500; }
+    .cid { word-break: break-all; }
+    .ok { color: var(--ok); }
+    .muted { color: var(--muted); }
+    a { color: var(--warn); }
+    pre { white-space: pre-wrap; word-break: break-all; margin: 0; }
+    .stats { display: flex; gap: 16px; flex-wrap: wrap; }
+    .stats span { color: var(--muted); }
+    .stats b { color: var(--fg); font-weight: 600; }
+    footer { padding: 12px 20px 24px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Keel operator</h1>
+      <div class="muted">This page is HTML. All numbers come from <a href="/v0">/v0</a>. Kill this tab; the CLI still works.</div>
+    </div>
+    <div class="stats" id="stats">loading…</div>
+  </header>
+  <main>
+    <section>
+      <h2>Accounts / millicredits</h2>
+      <div id="accounts"></div>
+    </section>
+    <section>
+      <h2>Jobs</h2>
+      <div id="jobs"></div>
+    </section>
+    <section>
+      <h2>Blobs</h2>
+      <div id="blobs"></div>
+    </section>
+    <section>
+      <h2>Movements</h2>
+      <div id="movements"></div>
+    </section>
+    <section>
+      <h2>Indexes</h2>
+      <div id="indexes"></div>
+    </section>
+    <section>
+      <h2>Seeders</h2>
+      <div id="seeders"></div>
+    </section>
+    <section>
+      <h2>Runners</h2>
+      <div id="runners"></div>
+    </section>
+    <section>
+      <h2>Payment intents</h2>
+      <div id="intents"></div>
+    </section>
+    <section>
+      <h2>Filters</h2>
+      <div id="filters"></div>
+    </section>
+    <section>
+      <h2>Peers</h2>
+      <div id="peers"></div>
+    </section>
+    <section style="grid-column: 1 / -1;">
+      <h2>API (bring your own frontend)</h2>
+      <pre id="api"></pre>
+    </section>
+  </main>
+  <footer>
+    Polls /v0/* every 2s. No third-party scripts. CID runner output is <code>cid-weights:</code>. Non-KEELW001 models still label <code>keel-mock:</code>.
+  </footer>
+  <script>
+    async function j(path) {
+      const r = await fetch(path);
+      if (!r.ok) throw new Error(path + " " + r.status);
+      return r.json();
+    }
+    function el(id) { return document.getElementById(id); }
+    function table(headers, rows) {
+      if (!rows.length) return '<p class="muted">none</p>';
+      const head = headers.map(h => "<th>" + h + "</th>").join("");
+      const body = rows.map(r => "<tr>" + r.map(c => "<td>" + c + "</td>").join("") + "</tr>").join("");
+      return "<table><thead><tr>" + head + "</tr></thead><tbody>" + body + "</tbody></table>";
+    }
+    function esc(s) {
+      return String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+    }
+    async function tick() {
+      try {
+        const [status, accounts, jobs, blobs, movements, api, indexes, seeders, runners, intents, filters, peers] = await Promise.all([
+          j("/v0/status"),
+          j("/v0/accounts"),
+          j("/v0/jobs"),
+          j("/v0/blobs"),
+          j("/v0/movements"),
+          j("/v0"),
+          j("/v0/indexes"),
+          j("/v0/seeders"),
+          j("/v0/runners"),
+          j("/v0/pay/intents"),
+          j("/v0/filters"),
+          j("/v0/peers/known"),
+        ]);
+        el("stats").innerHTML =
+          "<span>blobs <b>" + status.blobs + "</b></span>" +
+          "<span>jobs <b>" + status.jobs + "</b></span>" +
+          "<span>accounts <b>" + status.accounts + "</b></span>" +
+          "<span>free m¢ <b>" + status.millicredits_free + "</b></span>" +
+          "<span>held m¢ <b>" + status.millicredits_held + "</b></span>" +
+          (status.pubkey ? "<span>node <b class=\"cid\">" + esc(status.pubkey.slice(0, 16)) + "…</b></span>" : "") +
+          (status.visibility ? "<span>peers <b>" + esc(status.visibility) + "</b></span>" : "");
+        el("accounts").innerHTML = table(
+          ["account", "free", "held"],
+          (accounts.accounts || []).map(a => [
+            '<span class="cid">' + esc(a.account) + "</span>",
+            a.balance_millicredits,
+            a.held_millicredits
+          ])
+        );
+        el("jobs").innerHTML = table(
+          ["job", "status", "hold"],
+          (jobs.jobs || []).map(x => [
+            '<span class="cid">' + esc(x.job_id) + "</span>",
+            '<span class="' + (x.status === "succeeded" ? "ok" : "") + '">' + esc(x.status) + "</span>",
+            x.hold_millicredits
+          ])
+        );
+        el("blobs").innerHTML = table(
+          ["cid", "bytes"],
+          (blobs.blobs || []).map(b => [
+            '<a class="cid" href="/v0/blobs/' + esc(b.cid.replace("sha256:","")) + '">' + esc(b.cid) + "</a>",
+            b.size_bytes
+          ])
+        );
+        el("movements").innerHTML = table(
+          ["kind", "m¢", "key"],
+          (movements.movements || []).map(m => [
+            esc(m.kind),
+            m.amount_millicredits,
+            '<span class="cid">' + esc(m.idempotency_key) + "</span>"
+          ])
+        );
+        el("indexes").innerHTML = table(
+          ["publisher", "seq", "cid"],
+          (indexes.indexes || []).map(x => [
+            '<span class="cid">' + esc(x.publisher) + "</span>",
+            x.seq,
+            '<span class="cid">' + esc(x.cid) + "</span>"
+          ])
+        );
+        el("seeders").innerHTML = table(
+          ["file", "multiaddr"],
+          (seeders.seeders || []).map(s => [
+            '<span class="cid">' + esc(s.file_cid) + "</span>",
+            esc(s.multiaddr)
+          ])
+        );
+        el("runners").innerHTML = table(
+          ["from", "cid"],
+          (runners.runners || []).map(r => [
+            '<span class="cid">' + esc(r.from) + "</span>",
+            '<span class="cid">' + esc(r.cid) + "</span>"
+          ])
+        );
+        el("intents").innerHTML = table(
+          ["status", "m¢", "payment_hash"],
+          (intents.intents || []).map(i => [
+            esc(i.status),
+            i.millicredits,
+            '<span class="cid">' + esc(i.payment_hash || "") + "</span>"
+          ])
+        );
+        el("filters").innerHTML = table(
+          ["cid", "seq"],
+          (filters.filters || []).map(f => [
+            '<span class="cid">' + esc(f.cid) + "</span>",
+            f.seq
+          ])
+        );
+        el("peers").innerHTML = table(
+          ["from", "visibility"],
+          (peers.peers || []).map(p => [
+            '<span class="cid">' + esc((p.from || "") + "") + "</span>",
+            esc((p.body && p.body.visibility) || "")
+          ])
+        );
+        el("api").textContent = JSON.stringify(api, null, 2);
+      } catch (e) {
+        el("stats").textContent = String(e);
+      }
+    }
+    tick();
+    setInterval(tick, 2000);
+  </script>
+</body>
+</html>

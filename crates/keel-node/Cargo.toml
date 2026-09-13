@@ -1,0 +1,33 @@
+[package]
+name = "keel-node"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Local Keel node: blobs, millicredits, jobs, operator HTTP API"
+
+[dependencies]
+keel-types = { workspace = true }
+keel-runner = { workspace = true }
+async-trait = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+axum = { workspace = true }
+tower-http = { workspace = true }
+rusqlite = { workspace = true }
+getrandom = { workspace = true }
+hex = { workspace = true }
+bytes = { workspace = true }
+sha2 = { workspace = true }
+reqwest = { workspace = true }
+lightning-invoice = { workspace = true }
+bitcoin = { workspace = true }
+lightning-types = "0.1"
+base64 = "0.22"
+
+[dev-dependencies]
+tempfile = { workspace = true }
+tokio = { workspace = true }
+keel-runner = { workspace = true }
