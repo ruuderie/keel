@@ -1,0 +1,38 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/keel-types",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+rust-version = "1.80"
+
+[workspace.dependencies]
+keel-types = { path = "crates/keel-types" }
+keel-runner = { path = "crates/keel-runner" }
+keel-node = { path = "crates/keel-node" }
+keel-sdk = { path = "crates/keel-sdk" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+hex = "0.4"
+thiserror = "2"
+anyhow = "1"
+async-trait = "0.1"
+clap = { version = "4", features = ["derive", "env"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "net", "io-util", "sync", "time"] }
+axum = { version = "0.8", features = ["json", "macros"] }
+tower-http = { version = "0.6", features = ["cors"] }
+rusqlite = { version = "0.32", features = ["bundled"] }
+getrandom = "0.2"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+bytes = "1"
+tempfile = "3"
+ed25519-dalek = { version = "2.1", features = ["rand_core", "std"] }
+rand = "0.8"
+lightning-invoice = { version = "0.32", default-features = false, features = ["std"] }
+bitcoin = { version = "0.32", default-features = false, features = ["std"] }
+secp256k1 = { version = "0.29", features = ["global-context", "rand"] }
