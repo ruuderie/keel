@@ -1,0 +1,10 @@
+/target
+**/*.rs.bk
+.DS_Store
+.keel
+*.sqlite
+*.sqlite-journal
+identity.key
+**/identity.key
+.idea
+.vscode
